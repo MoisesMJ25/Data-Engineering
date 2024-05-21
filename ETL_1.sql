@@ -91,3 +91,21 @@ CREATE PROCEDURE pETL()
 -- Call the new procedure
 CALL pETL()
 ;
+
+/*
+	Questions:
+		1. ¿Cuál es el número promedio de días faltantes para cada década?
+		2. ¿Cuántos eventos comienzan con la letra 'D' y 'A' en cada década?
+*/
+-- Query result
+SELECT
+	CONCAT((EXTRACT(YEAR FROM ap.fecha_evento) - EXTRACT(YEAR FROM ap.fecha_evento) % 10),'-', (EXTRACT(YEAR FROM ap.fecha_evento) - EXTRACT(YEAR FROM ap.fecha_evento) % 10 + 9)) AS decade,
+    COUNT(ap.id_evento) Qty,
+    AVG(fm.dias_faltantes) Promedio_dias,
+    CASE WHEN ap.nombre_evento like 'D%' then 1 else 0 end as D_name,
+    CASE WHEN ap.nombre_evento like 'A%' then 1 else 0 end as A_name
+FROM data_engineer.eventos_apocalipticos ap
+	left join data_engineer.prediccion_fin_mundo fm on ap.id_evento = fm.id_evento
+GROUP BY decade
+ORDER BY decade ASC
+;
